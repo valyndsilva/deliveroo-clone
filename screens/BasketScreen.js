@@ -14,6 +14,7 @@ import { selectRestaurant } from "../redux/features/restaurantSlice";
 import {
   removeFromBasket,
   selectBasketItems,
+  selectBasketTotal,
 } from "../redux/features/basketSlice";
 import { XCircleIcon } from "react-native-heroicons/solid";
 import { urlFor } from "../lib/sanity";
@@ -23,6 +24,7 @@ export default function BasketScreen() {
   const [groupedItemsInBasket, setGroupedItemsInBasket] = useState([]);
   const navigation = useNavigation();
   const restaurant = useSelector(selectRestaurant);
+  const basketTotal = useSelector(selectBasketTotal);
   const items = useSelector(selectBasketItems);
   const dispatch = useDispatch();
 
@@ -64,10 +66,13 @@ export default function BasketScreen() {
             <Text className="text-[#00CCBB]">Change</Text>
           </TouchableOpacity>
         </View>
-        <ScrollView>
+        <ScrollView className="divide-y divide-gray-200">
           {Object.entries(groupedItemsInBasket).map(([key, items]) => (
-            <View key={key}>
-              <Text>{items.length} x</Text>
+            <View
+              key={key}
+              className="flex-row items-center space-x-3 bg-white py-2 px-5"
+            >
+              <Text className="text-[#00CCBB]">{items.length} x</Text>
               <Image
                 source={{ uri: urlFor(items[0]?.image).url() }}
                 className="h-12 w-12 rounded-full"
@@ -87,6 +92,34 @@ export default function BasketScreen() {
             </View>
           ))}
         </ScrollView>
+        <View className="p-5 bg-white mt-5 space-y-4">
+          <View className="flex-row justify-between">
+            <Text className="text-gray-400">Subtotal</Text>
+            <Text className="text-gray-400">
+              <Currency quantity={basketTotal} currency="GBP" />
+            </Text>
+          </View>
+          <View className="flex-row justify-between">
+            <Text className="text-gray-400">Delivery Fee</Text>
+            <Text className="text-gray-400">
+              <Currency quantity={5.99} currency="GBP" />
+            </Text>
+          </View>
+          <View className="flex-row justify-between">
+            <Text>Order Total</Text>
+            <Text className="font-extrabold">
+              <Currency quantity={basketTotal + 5.99} currency="GBP" />
+            </Text>
+          </View>
+          <TouchableOpacity
+            onPress={navigation.navigate("PreparingOrder")}
+            className="rounded-lg bg-[#00CCBB] p-4"
+          >
+            <Text className="text-center text-white text-lg font-bold">
+              Place Order
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
